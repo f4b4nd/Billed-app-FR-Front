@@ -25,6 +25,12 @@ export default class NewBill {
     formData.append('file', file)
     formData.append('email', email)
 
+    if (!fileName.match(/\.jpg$|\.jpeg$|\.png$/gm)) {
+      e.target.value = ''
+      alert ('Le justificatif doit être au format .jpg, .jpeg ou .png')
+      throw 'Submitted file is not in an accepted format (please use only .jpg, .jpeg or .png)'
+    }
+
     this.store
       .bills()
       .create({
@@ -37,7 +43,6 @@ export default class NewBill {
         console.log(fileUrl)
         this.billId = key
         this.fileUrl = fileUrl
-        this.fileName = fileName
       }).catch(error => console.error(error))
   }
   handleSubmit = e => {
