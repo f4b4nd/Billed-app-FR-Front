@@ -2,23 +2,33 @@
  * @jest-environment jsdom
  */
 
-import {screen, waitFor} from "@testing-library/dom"
+import {screen, waitFor, fireEvent} from "@testing-library/dom"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import { ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event'
 
 import router from "../app/Router.js";
+import Bills from "../containers/Bills.js";
+import { ROUTES } from "../constants/routes.js";
+
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock 
+})
+
+window.localStorage.setItem('user', JSON.stringify({type: 'Employee'}))
+
+const onNavigate = (pathname) => {
+  document.body.innerHTML = ROUTES({pathname})
+}
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
+
     test("Then bill icon in vertical layout should be highlighted", async () => {
 
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Employee'
-      }))
       const root = document.createElement("div")
       root.setAttribute("id", "root")
       document.body.append(root)
@@ -37,5 +47,28 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
+
+   
+    describe("When i click on eye icon", () => {
+      test("A modal should open", async () => {
+        
+        // simulate handleClickIconEye function
+        const bills = new Bills({document, onNavigate, store: null, localStorage: window.localStorage})
+        const handleClickIconEye = jest.fn((icon) => bills.handleClickIconEye(icon))
+        $.fn.modal = jest.fn(() => $())
+
+        // simulate event calling function when clicked
+        await waitFor(() => screen.getAllByTestId('icon-eye'))
+        const eyeIcon = screen.getAllByTestId('icon-eye')[0]
+        eyeIcon.addEventListener('click', function () { handleClickIconEye(this) })
+        fireEvent.click(eyeIcon)
+
+        // test that the function was called
+        expect(handleClickIconEye).toHaveBeenCalled()
+
+      })
+    })
+    
+
   })
 })
