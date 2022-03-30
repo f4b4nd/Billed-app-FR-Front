@@ -2,13 +2,13 @@
  * @jest-environment jsdom
  */
 
-import {screen, waitFor, fireEvent} from "@testing-library/dom"
+import {screen, waitFor, fireEvent} from "@testing-library/dom" ;
+import '@testing-library/jest-dom';
+
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import { ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
-import '@testing-library/jest-dom';
-import userEvent from '@testing-library/user-event'
 
 import router from "../app/Router.js";
 import Bills from "../containers/Bills.js";
@@ -23,6 +23,7 @@ window.localStorage.setItem('user', JSON.stringify({type: 'Employee'}))
 const onNavigate = (pathname) => {
   document.body.innerHTML = ROUTES({pathname})
 }
+
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
