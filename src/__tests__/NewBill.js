@@ -2,13 +2,16 @@
  * @jest-environment jsdom
  */
 
-import { screen, waitFor } from "@testing-library/dom"
+import { createEvent, fireEvent, screen, waitFor } from "@testing-library/dom"
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import "@testing-library/jest-dom"
 import router from "../app/Router.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js"
 import { localStorageMock } from "../__mocks__/localStorage.js"
+import { fileMock } from "../__mocks__/file.js"
+import newBillFixture from "../fixtures/newBill.js"
+import storeMock from '../__mocks__/store.js'
 
 /**
  * Then mail-icon should be highlighted
@@ -20,12 +23,14 @@ Object.defineProperty(window, 'localStorage', {
   value: localStorageMock
 })
 
-window.localStorage.setItem('user', JSON.stringify({type: 'Employee'}))
+window.localStorage.setItem('user', JSON.stringify({type: 'Employee', email: 'a@g.com'}))
 
+const onNavigate = (pathname) => {
+  document.body.innerHTML = ROUTES({pathname})
+}
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
-
 
     test("Then mail-icon should be highlighted", async () => {
       const root = document.createElement('div')
@@ -39,22 +44,47 @@ describe("Given I am connected as an employee", () => {
       expect(mailIcon).toHaveClass('active-icon')
     })
 
-    /*
-    describe("When a file is uploaded" , () => {
+    
+    describe("When a file is uploaded in not accepted format (other than jpeg, jpg, png)" , () => {
 
-      test("Then it should not have an accepted format", () => {
+      test.only("Then no bill should be created", () => {
 
+        document.body.innerHTML = NewBillUI()
+        window.localStorage.setItem('user', JSON.stringify({type: 'Employee', email: 'a@g.com'}))
+
+        const newBill = new NewBill({ document, onNavigate, store: storeMock, localStorage: window.localStorage })
+        
+        const handleChangeFile = jest.spyOn(newBill, 'handleChangeFile')
+
+        const input = screen.getByTestId('file')
+        input.addEventListener('change', handleChangeFile)
+        const event = createEvent.change(input, {preventDefault: () => {}, target: {Files: [new File(['a.pdf'], 'a.pdf'), {type: 'application/pdf'}]}})
+        fireEvent(input, event)
+        expect(handleChangeFile).toThrow('Submitted file is not in an accepted format (please use only .jpg, .jpeg or .png)')
       })
 
     })
 
-    describe("When user submits form" , () => {
+    
+    describe("When user submits form correctly" , () => {
 
-      test("Then it should not have an accepted format", () => {
+      test("Then a bill is created", () => {
 
+        document.body.innerHTML = NewBillUI()
+        window.localStorage.setItem('user', JSON.stringify({type: 'Employee', email: 'a@g.com'}))
+
+        const newBill = new NewBill({ document, onNavigate, store: storeMock, localStorage: window.localStorage })
+        
+        const updateBill = jest.spyOn(newBill, 'updateBill')
+
+        const form = screen.getByTestId('form-new-bill')
+        fireEvent.submit(form)
+
+        expect(updateBill).toHaveBeenCalledTimes(1)
+    
       })
 
-    })*/
+    })
 
   })
 })

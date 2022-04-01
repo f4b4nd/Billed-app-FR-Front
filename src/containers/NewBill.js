@@ -24,13 +24,14 @@ export default class NewBill {
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
     formData.append('email', email)
+    
+    console.log('file', file, 'email', email, 'event', e.target.value)
 
     if (!fileName.match(/\.jpg$|\.jpeg$|\.png$/gm)) {
       e.target.value = ''
-      alert ('Le justificatif doit être au format .jpg, .jpeg ou .png')
       throw 'Submitted file is not in an accepted format (please use only .jpg, .jpeg or .png)'
     }
-
+s
     this.store
       .bills()
       .create({
