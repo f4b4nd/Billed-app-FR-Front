@@ -58,9 +58,15 @@ describe("Given I am connected as an employee", () => {
 
         const input = screen.getByTestId('file')
         input.addEventListener('change', handleChangeFile)
-        const event = createEvent.change(input, {preventDefault: () => {}, target: {Files: [new File(['a.pdf'], 'a.pdf'), {type: 'application/pdf'}]}})
-        fireEvent(input, event)
-        expect(handleChangeFile).toThrow('Submitted file is not in an accepted format (please use only .jpg, .jpeg or .png)')
+        fireEvent.change(input, {
+          target: {
+              files: [new File(['file.txt'], 'file.txt', { type: 'text/txt' })],
+          }
+        })
+        expect(handleChangeFile).toBeCalled()
+        expect(input.files[0].name).toBe('file.txt')
+        expect(screen.getByTestId('error-file-format').style.display).toBe('block')
+
       })
 
     })

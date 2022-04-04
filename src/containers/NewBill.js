@@ -25,13 +25,16 @@ export default class NewBill {
     formData.append('file', file)
     formData.append('email', email)
     
-    console.log('file', file, 'email', email, 'event', e.target.value)
+    const errorDiv = document.querySelector('.error-file-format')
 
     if (!fileName.match(/\.jpg$|\.jpeg$|\.png$/gm)) {
       e.target.value = ''
-      throw 'Submitted file is not in an accepted format (please use only .jpg, .jpeg or .png)'
+      errorDiv.style.display = 'block'
+      return
     }
-s
+    errorDiv.style.display = 'none'
+    
+
     this.store
       .bills()
       .create({
