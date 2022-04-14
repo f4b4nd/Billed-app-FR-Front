@@ -72,6 +72,7 @@ export default class {
     this.document = document
     this.onNavigate = onNavigate
     this.store = store
+    this.activesContainersIndexes = []
     $('#arrow-icon1').click((e) => this.handleShowTickets(e, bills, 1))
     $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2))
     $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3))
@@ -87,7 +88,9 @@ export default class {
 
   handleEditTicket(e, bill, bills, containerIndex) {
 
-    if (this.billContainerIsActive[containerIndex]) {
+    console.log('handleEditTicket', 'bill', bill.name, 'containerIndex', containerIndex)
+  
+    if (this.activesContainersIndexes.includes(containerIndex)) {
       bills.forEach(bill => {
         $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
       })
@@ -132,28 +135,28 @@ export default class {
 
   handleShowTickets(e, bills, containerIndex) {
 
-    if (this.billContainerIsActive === undefined) {
-      this.billContainerIsActive = {}
-    }
-
-    if (!this.billContainerIsActive[containerIndex]) {
+    if (!this.activesContainersIndexes.includes(containerIndex)) {
       $(`#arrow-icon${containerIndex}`).css({ transform: 'rotate(0deg)'})
       $(`#status-bills-container${containerIndex}`)
         .html(cards(filteredBills(bills, getStatus(containerIndex))))
-        this.billContainerIsActive[containerIndex] = true
+        this.activesContainersIndexes.push(containerIndex)
     }
     
     else {
       $(`#arrow-icon${containerIndex}`).css({ transform: 'rotate(90deg)'})
       $(`#status-bills-container${containerIndex}`)
         .html("")
-        this.billContainerIsActive[containerIndex] = false
-      }
+        this.activesContainersIndexes = this.activesContainersIndexes.filter(v => v != containerIndex)
+    }
 
-    bills.forEach(bill => {
+    // fix bills edit ticket
+    const activeBills = filteredBills(bills, getStatus(containerIndex))
+
+    activeBills.forEach(bill => {
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills, containerIndex))
     })
 
+    //console.log('handleShowTickets ', this.activesContainersIndexes)
     return bills
 
   }

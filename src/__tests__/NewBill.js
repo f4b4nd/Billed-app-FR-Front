@@ -47,7 +47,7 @@ describe("Given I am connected as an employee", () => {
     
     describe("When a file is uploaded in not accepted format (other than jpeg, jpg, png)" , () => {
 
-      test.only("Then no bill should be created", () => {
+      test("Then no bill should be created", () => {
 
         document.body.innerHTML = NewBillUI()
         window.localStorage.setItem('user', JSON.stringify({type: 'Employee', email: 'a@g.com'}))
@@ -60,7 +60,7 @@ describe("Given I am connected as an employee", () => {
         input.addEventListener('change', handleChangeFile)
         fireEvent.change(input, {
           target: {
-              files: [new File(['file.txt'], 'file.txt', { type: 'text/txt' })],
+              files: [new File(['body'], 'file.txt', { type: 'text/txt' })],
           }
         })
         expect(handleChangeFile).toBeCalled()
@@ -70,7 +70,6 @@ describe("Given I am connected as an employee", () => {
       })
 
     })
-
     
     describe("When user submits form correctly" , () => {
 
@@ -80,14 +79,14 @@ describe("Given I am connected as an employee", () => {
         window.localStorage.setItem('user', JSON.stringify({type: 'Employee', email: 'a@g.com'}))
 
         const newBill = new NewBill({ document, onNavigate, store: storeMock, localStorage: window.localStorage })
-        
+
         const updateBill = jest.spyOn(newBill, 'updateBill')
 
         const form = screen.getByTestId('form-new-bill')
         fireEvent.submit(form)
 
         expect(updateBill).toHaveBeenCalledTimes(1)
-    
+
       })
 
     })

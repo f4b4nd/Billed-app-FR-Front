@@ -32,8 +32,8 @@ export default class NewBill {
       errorDiv.style.display = 'block'
       return
     }
+
     errorDiv.style.display = 'none'
-    
 
     this.store
       .bills()
