@@ -13,6 +13,9 @@ import {localStorageMock} from "../__mocks__/localStorage.js";
 import router from "../app/Router.js";
 import Bills from "../containers/Bills.js";
 import { ROUTES } from "../constants/routes.js";
+import store from "../__mocks__/store.js";
+import userEvent from "@testing-library/user-event";
+
 
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock 

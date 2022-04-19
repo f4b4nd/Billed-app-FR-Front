@@ -30,6 +30,7 @@ const onNavigate = (pathname) => {
 }
 
 describe("Given I am connected as an employee", () => {
+
   describe("When I am on NewBill Page", () => {
 
     test("Then mail-icon should be highlighted", async () => {
@@ -89,6 +90,25 @@ describe("Given I am connected as an employee", () => {
 
       })
 
+    })
+
+    describe("When i submit a bill form", () => {
+      test("Then handleSubmit function should be called", () => {
+
+        document.body.innerHTML = NewBillUI()
+        window.localStorage.setItem('user', JSON.stringify({type: 'Employee', email: 'a@g.com'}))
+        const newBill = new NewBill({ document, onNavigate, store: storeMock, localStorage: window.localStorage })
+
+        const formNewBill = screen.getByTestId('form-new-bill')
+        const handleSubmit = jest.spyOn(newBill, 'handleSubmit')
+    
+        formNewBill.addEventListener('submit', handleSubmit)
+  
+        fireEvent.submit(formNewBill)
+  
+        expect(handleSubmit).toHaveBeenCalled()
+
+      })
     })
 
   })
