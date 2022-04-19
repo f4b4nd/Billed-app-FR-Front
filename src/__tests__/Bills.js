@@ -94,5 +94,20 @@ describe("Given I am connected as an employee", () => {
       })
     })
 
+    describe('When back-end sends an error message', () => {
+      test('Then an error message should be rendered', () => {
+        document.body.innerHTML = BillsUI({ error: 'This is an error message' })
+        expect(screen.getAllByText('This is an error message')).toBeTruthy()
+      })
+    })
+
+    describe('When the page  is still loading', () => {
+      test('Then loading message should be displayed', () => {
+        document.body.innerHTML = BillsUI({ loading: true })
+        expect(screen.getAllByText('Loading...')).toBeTruthy()
+      })
+    })
+
   })
+
 })
