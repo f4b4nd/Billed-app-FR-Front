@@ -29,6 +29,7 @@ const onNavigate = (pathname) => {
 
 
 describe("Given I am connected as an employee", () => {
+
   describe("When I am on Bills Page", () => {
 
     test("Then bill icon in vertical layout should be highlighted", async () => {
@@ -52,9 +53,8 @@ describe("Given I am connected as an employee", () => {
       expect(dates).toEqual(datesSorted)
     })
 
-   
     describe("When i click on eye icon", () => {
-      test("A modal should open", async () => {
+      test("Then a modal should open", async () => {
         
         // simulate handleClickIconEye function
         const bills = new Bills({document, onNavigate, store: null, localStorage: window.localStorage})
@@ -73,6 +73,26 @@ describe("Given I am connected as an employee", () => {
       })
     })
     
+    describe("When i click on new bill button", () => {
+
+      test("Then i should be redirected on new Bill page", async () => {
+        
+        document.body.innerHTML = BillsUI({data : bills})
+        await waitFor(() => screen.getByTestId('btn-new-bill'))
+        const newBillButton = screen.getByTestId('btn-new-bill')
+        
+        const billsContainer = new Bills({document, onNavigate, store: null, localStorage: window.localStorage})
+        const handleClickNewBill = jest.spyOn(billsContainer, 'handleClickNewBill')
+        newBillButton.addEventListener('click', handleClickNewBill)
+        userEvent.click(newBillButton)
+
+        await waitFor(() => screen.getByText("Envoyer une note de frais"))
+        const newBillPageTitle = screen.getByText("Envoyer une note de frais")
+        expect(handleClickNewBill).toHaveBeenCalled()
+        expect(newBillPageTitle).toBeTruthy()
+
+      })
+    })
 
   })
 })
