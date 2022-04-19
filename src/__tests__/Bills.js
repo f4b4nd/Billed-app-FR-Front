@@ -6,14 +6,14 @@ import {screen, waitFor, fireEvent} from "@testing-library/dom" ;
 import '@testing-library/jest-dom';
 
 import BillsUI from "../views/BillsUI.js"
-import { bills } from "../fixtures/bills.js"
+import { bills as billsFixtures } from "../fixtures/bills.js"
 import { ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
 
 import router from "../app/Router.js";
 import Bills from "../containers/Bills.js";
 import { ROUTES } from "../constants/routes.js";
-import store from "../__mocks__/store.js";
+import storeMock from "../__mocks__/store.js";
 import userEvent from "@testing-library/user-event";
 
 
@@ -46,18 +46,30 @@ describe("Given I am connected as an employee", () => {
     })
 
     test("Then bills should be ordered from earliest to latest", () => {
-      document.body.innerHTML = BillsUI({ data: bills })
+      document.body.innerHTML = BillsUI({ data: billsFixtures })
       const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
       const antiChrono = (a, b) => ((a < b) ? 1 : -1)
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
 
+
+    test("Then bills are fetched from store", async () => {
+
+      const bills = new Bills({document, onNavigate: window.onNavigate, store: storeMock, localStorage: window.localStorage})
+      const getBills = jest.spyOn(bills, "getBills")
+      const billsFetched = await bills.getBills()
+
+      expect(billsFetched.length).toEqual(4)
+      expect(getBills).toHaveBeenCalled()
+
+    })
+
     describe("When i click on eye icon", () => {
       test("Then a modal should open", async () => {
         
         // simulate handleClickIconEye function
-        const bills = new Bills({document, onNavigate, store: null, localStorage: window.localStorage})
+        const bills = new Bills({document, onNavigate, store: storeMock, localStorage: window.localStorage})
         const handleClickIconEye = jest.fn((icon) => bills.handleClickIconEye(icon))
         $.fn.modal = jest.fn(() => $())
 
@@ -77,12 +89,12 @@ describe("Given I am connected as an employee", () => {
 
       test("Then i should be redirected on new Bill page", async () => {
         
-        document.body.innerHTML = BillsUI({data : bills})
+        document.body.innerHTML = BillsUI({data : billsFixtures})
         await waitFor(() => screen.getByTestId('btn-new-bill'))
         const newBillButton = screen.getByTestId('btn-new-bill')
         
-        const billsContainer = new Bills({document, onNavigate, store: null, localStorage: window.localStorage})
-        const handleClickNewBill = jest.spyOn(billsContainer, 'handleClickNewBill')
+        const bills = new Bills({document, onNavigate, store: null, localStorage: window.localStorage})
+        const handleClickNewBill = jest.spyOn(bills, 'handleClickNewBill')
         newBillButton.addEventListener('click', handleClickNewBill)
         userEvent.click(newBillButton)
 
