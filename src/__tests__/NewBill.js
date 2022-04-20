@@ -12,6 +12,7 @@ import { localStorageMock } from "../__mocks__/localStorage.js"
 import { fileMock } from "../__mocks__/file.js"
 import newBillFixture from "../fixtures/newBill.js"
 import storeMock from '../__mocks__/store.js'
+import BillsUI from '../views/BillsUI.js'
 
 /**
  * Then mail-icon should be highlighted
@@ -113,7 +114,8 @@ describe("Given I am connected as an employee", () => {
 
     // Test d'intégration POST
     describe('When a valid bill is submitted', () => {
-      test.only('Then a new bill is generated', async () => {
+
+      test('Then a new bill is generated', async () => {
   
         const storeSpy = jest.spyOn(storeMock, "bills")
   
@@ -137,6 +139,50 @@ describe("Given I am connected as an employee", () => {
 
         expect(storeSpy).toHaveBeenCalledTimes(1)
   
+      })
+    })
+
+    describe('When API fails with 404 error', () => {
+
+      test('Then a 404 error message should be displayed', async () => {
+
+        jest.spyOn(storeMock, "bills")
+
+        storeMock.bills.mockImplementationOnce(() => {
+          return {
+            create: () => {
+              return Promise.reject(new Error("Erreur 404"))
+            }
+          }
+        })
+  
+        document.body.innerHTML = BillsUI({ error: 'Erreur 404' })
+  
+        const errorMessage = screen.getByText(/Erreur 404/)
+        expect(errorMessage).toBeTruthy()
+
+      })
+
+    })
+
+    describe('When API fails with 500 error', () => {
+
+      test('Then a 404 error message should be displayed', async () => {
+
+        jest.spyOn(storeMock, "bills")
+
+        storeMock.bills.mockImplementationOnce(() => {
+          return {
+            list : () =>  {
+              return Promise.reject(new Error("Erreur 500"))
+            }
+          }})
+  
+        document.body.innerHTML = BillsUI({ error: 'Erreur 500' });
+
+        const errorMessage = screen.getByText(/Erreur 500/)
+        expect(errorMessage).toBeTruthy()
+
       })
     })
 
