@@ -113,7 +113,7 @@ describe("Given I am connected as an employee", () => {
       })
     })
 
-    describe('When the page  is still loading', () => {
+    describe('When the page is still loading', () => {
       test('Then loading message should be displayed', () => {
         document.body.innerHTML = BillsUI({ loading: true })
         expect(screen.getAllByText('Loading...')).toBeTruthy()
