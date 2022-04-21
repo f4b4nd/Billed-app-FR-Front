@@ -72,7 +72,7 @@ export default class {
     this.document = document
     this.onNavigate = onNavigate
     this.store = store
-    this.activesContainersIndexes = []
+    //this.activesContainersIndexes = []
     $('#arrow-icon1').click((e) => this.handleShowTickets(e, bills, 1))
     $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2))
     $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3))
@@ -86,17 +86,19 @@ export default class {
     if (typeof $('#modaleFileAdmin1').modal === 'function') $('#modaleFileAdmin1').modal('show')
   }
 
-  handleEditTicket(e, bill, bills, containerIndex) {
+  handleEditTicket(e, bill, bills) {
+    
+    if (this.counter === undefined || this.id !== bill.id) this.counter = 0
+    if (this.id === undefined || this.id !== bill.id) this.id = bill.id
+    if (this.counter % 2 === 0) {
 
-    console.log('handleEditTicket', 'bill', bill.name, 'containerIndex', containerIndex)
-  
-    if (this.activesContainersIndexes.includes(containerIndex)) {
       bills.forEach(bill => {
         $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
       })
       $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
       $('.dashboard-right-container div').html(DashboardFormUI(bill))
       $('.vertical-navbar').css({ height: '150vh' })
+      this.counter ++
     } 
     
     else {
@@ -106,6 +108,7 @@ export default class {
         <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
       `)
       $('.vertical-navbar').css({ height: '120vh' })
+      this.counter ++
     }
 
     $('#icon-eye-d').click(this.handleClickIconEye)
@@ -133,34 +136,34 @@ export default class {
     this.onNavigate(ROUTES_PATH['Dashboard'])
   }
 
-  handleShowTickets(e, bills, containerIndex) {
+  handleShowTickets(e, bills, index) {
 
-    if (!this.activesContainersIndexes.includes(containerIndex)) {
-      $(`#arrow-icon${containerIndex}`).css({ transform: 'rotate(0deg)'})
-      $(`#status-bills-container${containerIndex}`)
-        .html(cards(filteredBills(bills, getStatus(containerIndex))))
-        this.activesContainersIndexes.push(containerIndex)
-    }
+    if (this.counter === undefined || this.index !== index) this.counter = 0
+    if (this.index === undefined || this.index !== index) this.index = index
+    if (this.counter % 2 === 0) {
+      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
+      $(`#status-bills-container${this.index}`)
+        .html(cards(filteredBills(bills, getStatus(this.index))))
+        this.counter ++
+      }
     
     else {
-      $(`#arrow-icon${containerIndex}`).css({ transform: 'rotate(90deg)'})
-      $(`#status-bills-container${containerIndex}`)
+      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})
+      $(`#status-bills-container${this.index}`)
         .html("")
-        this.activesContainersIndexes = this.activesContainersIndexes.filter(v => v != containerIndex)
-    }
+        this.counter ++
+      }
 
-    // fix bills edit ticket
-    const activeBills = filteredBills(bills, getStatus(containerIndex))
-
-    activeBills.forEach(bill => {
-      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills, containerIndex))
+    bills.forEach(bill => {
+      $(`#status-bills-container${index} #open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
     })
 
-    //console.log('handleShowTickets ', this.activesContainersIndexes)
     return bills
 
   }
 
+  // not need to cover this function by tests
+  /* istanbul ignore next */
   getBillsAllUsers = () => {
     if (this.store) {
       return this.store
