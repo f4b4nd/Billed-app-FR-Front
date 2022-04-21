@@ -178,7 +178,7 @@ describe("Given I am connected as an employee", () => {
             }
           }})
   
-        document.body.innerHTML = BillsUI({ error: 'Erreur 500' });
+        document.body.innerHTML = BillsUI({ error: 'Erreur 500' })
 
         const errorMessage = screen.getByText(/Erreur 500/)
         expect(errorMessage).toBeTruthy()

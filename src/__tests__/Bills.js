@@ -120,6 +120,77 @@ describe("Given I am connected as an employee", () => {
       })
     })
 
+    // Integration test GET
+    describe("When I navigate to Bills page", () => {
+
+      beforeEach(() => {
+        jest.spyOn(storeMock, "bills")
+        Object.defineProperty(
+            window,
+            'localStorage',
+            { value: localStorageMock }
+        )
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Employee',
+          email: "a@a"
+        }))
+        const root = document.createElement("div")
+        root.setAttribute("id", "root")
+        document.body.appendChild(root)
+        router()
+      })
+  
+      test("fetches bills from mock API GET", async () => {
+        
+        document.body.innerHTML = BillsUI({data : billsFixtures})
+
+        await waitFor(() => screen.getByText("Mes notes de frais"))
+  
+        const billsNodes = await screen.getByTestId('tbody')
+  
+        expect([...billsNodes.children].length).toEqual(4)
+
+      })
+  
+      describe("When an error occurs on API", () => {
+
+        test("fetches bills from an API and fails with 404 message error", async () => {
+
+          storeMock.bills.mockImplementationOnce(() => {
+            return {
+              list : () =>  {
+                return Promise.reject(new Error("Erreur 404"))
+              }
+            }
+          })
+
+          document.body.innerHTML = BillsUI({ error: 'Erreur 404' })
+
+          const message = await screen.getByText(/Erreur 404/)
+          expect(message).toBeTruthy()
+
+        })
+    
+        test("fetches messages from an API and fails with 500 message error", async () => {
+          
+          storeMock.bills.mockImplementationOnce(() => {
+            return {
+              list : () =>  {
+                return Promise.reject(new Error("Erreur 500"))
+              }
+            }
+          })
+          
+          document.body.innerHTML = BillsUI({ error: 'Erreur 500' })
+
+          const message = await screen.getByText(/Erreur 500/)
+          expect(message).toBeTruthy()
+        })
+    
+      })
+
+    })
+
   })
 
 })
